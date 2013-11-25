@@ -1,0 +1,1 @@
+naturaldocs -i "../src" -o HTML "../docs/data" -p "../docs"

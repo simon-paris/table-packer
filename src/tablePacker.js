@@ -105,7 +105,7 @@
     
     
     /**
-     * Function: addAll
+     * Function: each
      * 
      * Calls the add method on obj, passing in every item in the table.
 	 * TODO: This should be replaced with something more generic.
@@ -114,10 +114,10 @@
      *      obj - The item to call add on.
      * 
      */
-    TablePacker.prototype.addAll = function (obj) {
+    TablePacker.prototype.each = function (f) {
         for (var i = 0; i < this.items.length; i++) {
             for (var j = 0; j < this.items[i].length; j++) {
-                obj.add(this.items[i][j].item);
+                f(this.items[i][j].item);
             }
         }
     };

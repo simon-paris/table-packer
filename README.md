@@ -28,23 +28,24 @@ This will add an object with center alignment and no margins.
 table.add(myItem);
 ```
 
-You can also set horizontal alignments using the `left` and `right` functions. The margin
+You can set horizontal alignments using the `left` and `right` functions. The margin
 function sets the margin to one value on all sides:
 
 ```javascript
 table.add(myItem).margin(10).left();
 ```
+You can also set individual margins.
 
 ```javascript
 table.add(myItem).margin("left", 10);
 ```
-You can also set individual margins.
+
+The `row` function completes the current row and starts a new one. The height of a row is
+is the height of the highest item including margins. Empty rows have no effect.
 
 ```javascript
 table.row();
 ```
-The `row` function completes the current row and starts a new one. The height of a row is
-is the height of the highest item including margins. Empty rows have no effect.
 
 ###Laying out items
 
@@ -64,12 +65,12 @@ table.each(function(item) { /* Do stuff with item */ });
 ```
 
 
+The `setBounds` function can resize the table.
 
 ```setBounds
 table.setBounds(xPos, yPos, width, height);
 ```
 
-The `setBounds` function can resize the table.
 
 
 

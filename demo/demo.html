@@ -1,0 +1,159 @@
+<!DOCTYPE html5>
+<html>
+    <head>
+        <script type="text/javascript" src="../src/tablePacker.js"></script>
+        <script type="text/javascript" src="pixi.js"></script>
+        <script type="text/javascript" src="dat.gui.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <title>TablePacker Demo</title>
+    </head>
+    <body>
+        
+        <script type="text/javascript">
+            
+            
+            var PAGE_MARGIN = 100,
+                MARGIN = 5,
+                table = null,
+                graphics = null;
+            
+            function width() {
+                return document.body.clientWidth - PAGE_MARGIN * 2;
+            }
+            
+            function height() {
+                return document.body.clientHeight - PAGE_MARGIN * 2;
+            }
+            
+            
+            function init() {
+                table = new TablePacker(PAGE_MARGIN, PAGE_MARGIN, width(), height());
+            }
+            
+            
+            
+            function redrawStage() {
+                
+                graphics.clear();
+                table.layout();
+                drawRect(PAGE_MARGIN, PAGE_MARGIN, width() + PAGE_MARGIN, height() + PAGE_MARGIN, 0xEEEEEE);
+                table.addAll({add: function (o) {
+                    
+                    drawRect(o.position.x,
+                             o.position.y,
+                             o.position.x + o.width,
+                             o.position.y + o.height,
+                             o.color);
+                    
+                }});
+                
+            }
+            
+                        
+                        
+            function rgb(r, g, b) {
+                return (0xFF0000 && (r << 16)) +
+                        (0x00FF00 && (g << 8)) +
+                        (0x0000FF && (b << 0));
+            }
+            
+
+            
+            function drawRect(x1, y1, x2, y2, color) {
+                
+                // begin a green fill..
+                graphics.beginFill(color);
+                
+                // draw a triangle using lines
+                graphics.moveTo(x1, y1);
+                graphics.lineTo(x2, y1);
+                graphics.lineTo(x2, y2);
+                graphics.lineTo(x1, y2);
+                
+                // end the fill
+                graphics.endFill();
+                
+            }
+            
+            
+            
+            var renderer = new PIXI.WebGLRenderer(document.body.clientWidth, document.body.clientHeight); 
+            document.body.appendChild(renderer.view);
+            var stage = new PIXI.Stage(0xFFFFFF);
+            graphics = new PIXI.Graphics();
+            stage.addChild(graphics);
+            
+            
+            init();
+            redrawStage();
+            
+            
+            
+            requestAnimationFrame(animate);
+            function animate() {
+                renderer.render(stage);
+                requestAnimationFrame(animate);
+            }
+            
+            
+
+            window.onresize = function(event) {
+                renderer.resize(document.body.clientWidth, document.body.clientHeight);
+                table.setBounds(PAGE_MARGIN, PAGE_MARGIN, width(), height());
+                redrawStage();
+            }
+            
+            
+            
+            function randomRect() {
+                var color = Math.random() * 155 + 100;
+                return {
+                    position: {x: 0, y: 0},
+                    width: Math.random() * 100 + 50,
+                    height: Math.random() * 100 + 50,
+                    color: rgb(color, color, color),
+                };
+            }
+            
+                        
+            
+            var params = {
+                "Add left aligned": function() {
+                    table.add(randomRect()).left().margin(MARGIN);
+                    redrawStage();
+                },
+                "Add right aligned": function() {
+                    table.add(randomRect()).right().margin(MARGIN);
+                    redrawStage();
+                },
+                "Add center aligned": function() {
+                    table.add(randomRect()).margin(MARGIN);
+                    redrawStage();
+                },
+                "Next row": function() {
+                    table.row();
+                    redrawStage();
+                },
+                "Reset": function() {
+                    init();
+                    redrawStage();
+                },
+            };
+            
+            
+            
+            var gui = new dat.GUI();
+            
+            // Checkbox field
+            for (var prop in params) {
+                if (params.hasOwnProperty(prop)) {
+                    gui.add(params, prop);
+                }
+            }
+
+
+        </script>
+
+        
+    </body>
+</html>

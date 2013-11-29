@@ -74,6 +74,37 @@
     
     
     /**
+     * Function: setBounds
+     * 
+     * Resize the table.
+	 * 
+	 * Parameters:
+     *      x - left bound.
+     *      y - top bound.
+     *      w - width.
+     *      h - height.
+     * 
+     */
+    TablePacker.prototype.setBounds = function (x, y, w, h) {
+        
+        this.bounds = {
+            x: x,
+            y: y,
+            w: w,
+            h: h,
+        };
+        this.position = {x: x, y: y};
+        this.x = x;
+        this.y = y;
+        this.width = w;
+        this.height = h;
+        
+    };
+    
+    
+    
+    
+    /**
      * Function: addAll
      * 
      * Calls the add method on obj, passing in every item in the table.
@@ -160,7 +191,7 @@
                 
             }
             
-            //Place left aligned cells. Center aligned cells are placed equidistant from eachother.
+            //Place center aligned cells. Center aligned cells are placed equidistant from eachother.
             thisSide = alignments.center;
             if (thisSide.length) {
                 
@@ -284,7 +315,11 @@
     
     
     TablePacker.Cell = Cell;
-    module.exports = TablePacker;
+    if (typeof module !== "undefined") {
+        module.exports = TablePacker;
+    } else if (typeof window !== "undefined") {
+        window.TablePacker = TablePacker;
+    }
     
     
     

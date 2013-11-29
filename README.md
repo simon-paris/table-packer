@@ -4,12 +4,12 @@ table-packer
 A simple, pure JS UI layout library for HTML5 canvas and non browser based
 JavaScript. Currently a WIP. Use with caution.
 
-##TODO list:
--Tests
--Demo program
--Customizable output format
--Vertical alignment
--Margins on rows
+###TODO list:
+ * Tests
+ * Demo program
+ * Customizable output format
+ * Vertical alignment
+ * Margins on rows
 
 
 ##Documentation
@@ -48,7 +48,7 @@ is the height of the highest item including margins. Empty rows have no effect.
 
 ###Laying out items
 
-This sets the location of all the items in the table.
+Once you've added everything to the table, call `layout`. It updates the position of each element.
 
 ```javascript
 table.layout();
@@ -56,11 +56,13 @@ table.layout();
 
 
 ###Other things
+
+The `each` method is calls a function for each item in the table.
+
 ```javascript
 table.each(function(item) { /* Do stuff with item */ });
 ```
 
-This method is calls a function for each item in the table.
 
 
 ```setBounds

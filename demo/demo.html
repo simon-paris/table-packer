@@ -36,8 +36,8 @@
                 
                 graphics.clear();
                 table.layout();
-                drawRect(PAGE_MARGIN, PAGE_MARGIN, width() + PAGE_MARGIN, height() + PAGE_MARGIN, 0xEEEEEE);
-                table.addAll({add: function (o) {
+                drawRect(PAGE_MARGIN, PAGE_MARGIN, width() + PAGE_MARGIN, height() + PAGE_MARGIN, 0xDDDDDD);
+                table.each(function (o) {
                     
                     drawRect(o.position.x,
                              o.position.y,
@@ -45,13 +45,16 @@
                              o.position.y + o.height,
                              o.color);
                     
-                }});
+                });
                 
             }
             
                         
                         
             function rgb(r, g, b) {
+                r = Math.max(0, Math.min(r, 255));
+                g = Math.max(0, Math.min(g, 255));
+                b = Math.max(0, Math.min(b, 255));
                 return (0xFF0000 && (r << 16)) +
                         (0x00FF00 && (g << 8)) +
                         (0x0000FF && (b << 0));
@@ -107,11 +110,12 @@
             
             function randomRect() {
                 var color = Math.random() * 155 + 100;
+                var sizeUnit = (width() + height()) / 30;
                 return {
                     position: {x: 0, y: 0},
-                    width: Math.random() * 100 + 50,
-                    height: Math.random() * 100 + 50,
-                    color: rgb(color, color, color),
+                    width: Math.random() * sizeUnit + sizeUnit / 2,
+                    height: Math.random() * sizeUnit + sizeUnit / 2,
+                    color: rgb(color, color, color + Math.random() * 30),
                 };
             }
             

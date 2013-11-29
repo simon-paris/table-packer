@@ -107,11 +107,10 @@
     /**
      * Function: each
      * 
-     * Calls the add method on obj, passing in every item in the table.
-	 * TODO: This should be replaced with something more generic.
+     * Calls the passed method for each item in the table.
      * 
      * Parameters:
-     *      obj - The item to call add on.
+     *      f - The function to call for each item.
      * 
      */
     TablePacker.prototype.each = function (f) {

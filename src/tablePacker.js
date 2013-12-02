@@ -36,7 +36,31 @@
         this.width = w;
         this.height = h;
         
+        this.interface = {};
+        for (var prop in TablePacker.defaults) {
+            if (TablePacker.defaults.hasOwnProperty(prop)) {
+                this.interface[prop] = TablePacker.defaults[prop];
+            }
+        }
+        
     }
+    
+    
+    
+    
+    TablePacker.defaults = {
+        getWidth: function(o) { return o.width; },
+        getHeight: function(o) { return o.height; },
+        getX: function(o) { return o.x; },
+        getY: function(o) { return o.y; },
+        setX: function(o, x) { o.x = x; },
+        setY: function(o, y) { o.y = y; },
+        margin: 10,
+        align: "center",
+    };
+    
+    
+    
     
     
     
@@ -52,7 +76,7 @@
      * A cell containg the item.
      */
     TablePacker.prototype.add = function (item) {
-        var cell = new Cell(item);
+        var cell = new Cell(item, this);
         this.items[this.items.length - 1].push(cell);
         return cell;
     };
@@ -154,12 +178,12 @@
                 alignments[align].push(row[j]);
                 
                 //Set the y position for all the elements.
-                row[j].item.position.y = y + row[j].getMargin("top");
+                this.interface.setY(row[j].item, y + row[j].getMargin("top"));
                 
 				//Work out the height of the whole row.
                 var vmargin = row[j].getMargin("top") + row[j].getMargin("bottom");
-                if (row[j].item.height + vmargin > biggestHeight) {
-                    biggestHeight = row[j].item.height + vmargin;
+                if (this.interface.getHeight(row[j].item) + vmargin > biggestHeight) {
+                    biggestHeight = this.interface.getHeight(row[j].item) + vmargin;
                 }
             }
             
@@ -173,9 +197,9 @@
             thisSide = alignments.left;
             for (j = 0; j < thisSide.length; j++) {
                 
-                thisSide[j].item.position.x = leftBound + thisSide[j].getMargin("left");
+                this.interface.setX(thisSide[j].item, leftBound + thisSide[j].getMargin("left"));
                 hmargin =  + thisSide[j].getMargin("left") + thisSide[j].getMargin("right");
-                leftBound += thisSide[j].item.width + hmargin;
+                leftBound += this.interface.getWidth(thisSide[j].item) + hmargin;
                 
             }
             
@@ -183,10 +207,12 @@
             thisSide = alignments.right;
             for (j = 0; j < thisSide.length; j++) {
                 
-                thisSide[j].item.position.x =
-                    rightBound - thisSide[j].item.width - thisSide[j].getMargin("right");
+                this.interface.setX(
+                    thisSide[j].item,
+                    rightBound - this.interface.getWidth(thisSide[j].item) - thisSide[j].getMargin("right")
+                );
                 hmargin = thisSide[j].getMargin("left") + thisSide[j].getMargin("right");
-                rightBound -= thisSide[j].item.width + hmargin;
+                rightBound -= this.interface.getWidth(thisSide[j].item) + hmargin;
                 
             }
             
@@ -198,7 +224,7 @@
                 
 				//Work out how much space the cells take up horizontally.
                 for (j = 0; j < thisSide.length; j++) {
-                    totalWidth += thisSide[j].item.width;
+                    totalWidth += this.interface.getWidth(thisSide[j].item);
                 }
                 
 				//Work out the gap between elemets.
@@ -208,8 +234,8 @@
 				
 				//Assign X positions.
                 for (j = 0; j < thisSide.length; j++) {
-                    thisSide[j].item.position.x = leftBound;
-                    leftBound += thisSide[j].item.width + gap;
+                    this.interface.setX(thisSide[j].item, leftBound);
+                    leftBound += this.interface.getWidth(thisSide[j].item) + gap;
                 }
 
             }
@@ -234,14 +260,15 @@
      * Parameters:
      *      item - the item to be contained in this cell.
      */
-    function Cell(item) {
+    function Cell(item, parentTable) {
         this.item = item;
-        this.align = "center";
+        this.align = parentTable.interface.align;
+        var defaultMargin = parentTable.interface.margin;
         this.margins = {
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
+            left: defaultMargin,
+            right: defaultMargin,
+            top: defaultMargin,
+            bottom: defaultMargin,
         };
     }
     
@@ -311,6 +338,7 @@
     Cell.prototype.getMargin = function (side) {
         return this.margins[side];
     };
+    
     
     
     TablePacker.Cell = Cell;

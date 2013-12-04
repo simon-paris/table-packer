@@ -26,6 +26,7 @@
      */
     function TablePacker(x, y, w, h) {
         
+        //copy the default settings to this table
         this.interface = {};
         for (var prop in TablePacker.defaults) {
             if (TablePacker.defaults.hasOwnProperty(prop)) {
@@ -67,7 +68,15 @@
             } else if (policy === TablePacker.OVERFLOW_POLICY.DISCARD) {
                 return cell;
             } else if (policy === TablePacker.OVERFLOW_POLICY.NEW_ROW) {
-                this.row(this);
+                var newRow = this.row(this);
+                
+                //copy the old row's properties to the new row.
+                newRow.margin("left", row.margins.left).
+                        margin("right", row.margins.right).
+                        margin("top", row.margins.top).
+                        margin("bottom", row.margins.bottom);
+                newRow.align = row.align;
+                
             } else if (policy === TablePacker.OVERFLOW_POLICY.SQUISH) {
                 //do nothing;
             }
@@ -138,7 +147,29 @@
     };
     
     
+        
+    /**
+     * Function: getAllWithAlign
+     * 
+     * Return a list of all cells with given alignment. Ignores empty rows.
+     * 
+     * Parameters:
+     *      align - the alignment to search for.
+     * 
+     * Returns:
+     * A list of all the cells with the given alignment.
+     */
+    TablePacker.prototype.getAllWithAlign = function (align) {
+        var a = [];
+        for (var i = 0; i < this.rows.length; i++) {
+            if (this.rows[i].align === align && this.rows[i].numCells()) {
+                a.push(this.rows[i]);
+            }
+        }
+        return a;
+    };
     
+
     
     /**
      * Function: each
@@ -167,87 +198,68 @@
     TablePacker.prototype.layout = function () {
         
         //copy the boulds object because we're going to be modifying it.
-        var topBound = this.bounds.y;
+        var topBound = this.bounds.y,
+            bottomBound = this.bounds.y + this.bounds.h,
+            thisSide = null,
+            height = 0,
+            i = 0,
+            alignments = {top: this.getAllWithAlign("top"),
+                          bottom: this.getAllWithAlign("bottom"),
+                          center: this.getAllWithAlign("center")};
         
-        for (var i = 0; i < this.rows.length; i++) {
+        
+        thisSide = alignments.top;
+        for (i = 0; i < thisSide.length; i++) {
             
-            
-            var row = this.rows[i],
-                leftBound = this.bounds.x + row.getMargin("left"),
-                rightBound = this.bounds.x + this.bounds.w - row.getMargin("right"),
-                thisSide = [],
-                hmargin = 0,
-                alignments = {left: row.getAllWithAlign("left"),
-                              right: row.getAllWithAlign("right"),
-                              center: row.getAllWithAlign("center")};
-            
-            
-            
-            //Set the y position for all the elements.
-            for (var j = 0; j < row.numCells(); j++) {
-                this.interface.setY(row.get(j).item, topBound + row.getMargin("top") + row.get(j).getMargin("top"));
-            }
-            
-            
-            
-            //Place left aligned cells.
-            thisSide = alignments.left;
-            for (j = 0; j < thisSide.length; j++) {
-                
-                this.interface.setX(
-                    thisSide[j].item,
-                    leftBound + thisSide[j].getMargin("left")
-                );
-                hmargin = thisSide[j].getMargin("left") + thisSide[j].getMargin("right");
-                leftBound += this.interface.getWidth(thisSide[j].item) + hmargin;
-                
-            }
-            
-            
-            
-            //Place right aligned cells.
-            thisSide = alignments.right;
-            for (j = 0; j < thisSide.length; j++) {
-                
-                this.interface.setX(
-                    thisSide[j].item,
-                    rightBound - this.interface.getWidth(thisSide[j].item) - thisSide[j].getMargin("right")
-                );
-                hmargin = thisSide[j].getMargin("left") + thisSide[j].getMargin("right");
-                rightBound -= this.interface.getWidth(thisSide[j].item) + hmargin;
-                
-            }
-            
-            
-            
-            //Place center aligned cells. Center aligned cells are placed equidistant from eachother.
-            thisSide = alignments.center;
-            if (thisSide.length) {
-                
-                var totalWidth = 0;
-                
-				//Work out how much space the cells take up horizontally.
-                for (j = 0; j < thisSide.length; j++) {
-                    totalWidth += this.interface.getWidth(thisSide[j].item);
-                }
-                
-				//Work out the gap between elemets.
-                var gap = rightBound - leftBound - totalWidth;
-                gap /= thisSide.length + 1;
-                leftBound += gap;
-				
-				//Assign X positions.
-                for (j = 0; j < thisSide.length; j++) {
-                    this.interface.setX(thisSide[j].item, leftBound);
-                    leftBound += this.interface.getWidth(thisSide[j].item) + gap;
-                }
+            height = thisSide[i].layout(
+                this.bounds.x,
+                topBound,
+                this.bounds.x + this.bounds.w,
+                bottomBound
+            );
+            topBound += height;
 
-            }
-            
-            
-            topBound += row.getHeight();
-                
         }
+        
+        
+        thisSide = alignments.bottom;
+        for (i = 0; i < thisSide.length; i++) {
+            
+            height = thisSide[i].layout(
+                this.bounds.x,
+                bottomBound - thisSide[i].getHeight(),
+                this.bounds.x + this.bounds.w,
+                bottomBound
+            );
+            bottomBound -= height;
+
+        }
+        
+        
+        
+        
+        thisSide = alignments.center;
+        var totalHeight = 0;
+        for (i = 0; i < thisSide.length; i++) {
+            totalHeight += thisSide[i].getHeight();
+        }
+        
+        var gap = bottomBound - topBound - totalHeight;
+        gap /= thisSide.length + 1;
+        topBound += gap;
+        
+        for (i = 0; i < thisSide.length; i++) {
+            
+            height = thisSide[i].layout(
+                this.bounds.x,
+                topBound,
+                this.bounds.x + this.bounds.w,
+                bottomBound
+            );
+            topBound += height + gap;
+
+        }
+                
         
     };
     
@@ -362,6 +374,12 @@
         align: "center",
         
         /**
+         * Variable: rowAlign
+         * The default alignment for new rows.
+         */
+        rowAlign: "top",
+        
+        /**
          * Variable: overflowPolicy
          * Describes what to do if there is no room in a row.
          */
@@ -405,14 +423,9 @@
     function Row(parentTable) {
         this.cells = [];
         this.parentTable = parentTable;
-        
-        var rowMargin = parentTable.interface.rowMargin;
-        this.margins = {
-            left: rowMargin,
-            right: rowMargin,
-            top: rowMargin,
-            bottom: rowMargin,
-        };
+        this.align = parentTable.interface.rowAlign;
+        this.margins = {};
+        this.margin(parentTable.interface.rowMargin);
     }
     Row.prototype = Object.create(Object.prototype);
     
@@ -429,6 +442,50 @@
      */
     Row.prototype.add = function (cell) {
         this.cells.push(cell);
+    };
+    
+    
+    
+    /**
+     * Function: top
+     * 
+     * Align the row to the top
+     * 
+     * Returns:
+     * this row.
+     */
+    Row.prototype.top = function () {
+        this.align = "top";
+        return this;
+    };
+    
+    
+    
+    /**
+     * Function: bottom
+     * 
+     * Align the row to the bottom
+     * 
+     * Returns:
+     * this row.
+     */
+    Row.prototype.bottom = function () {
+        this.align = "bottom";
+        return this;
+    };
+    
+    
+    /**
+     * Function: center
+     * 
+     * Align the row to the center
+     * 
+     * Returns:
+     * this row.
+     */
+    Row.prototype.center = function () {
+        this.align = "center";
+        return this;
     };
     
     
@@ -483,8 +540,7 @@
         var hypothetical = [cell].concat(this.cells);
         for (var i = 0; i < hypothetical.length; i++) {
             total += this.parentTable.interface.getWidth(hypothetical[i].item);
-            total += hypothetical[i].getMargin("left");
-            total += hypothetical[i].getMargin("right");
+            total += hypothetical[i].totalHorizontalMargin();
         }
         total += this.margins.left + this.margins.right;
         if (total > this.parentTable.width) {
@@ -507,9 +563,8 @@
     Row.prototype.getHeight = function () {
         var biggest = 0;
         for (var i = 0; i < this.cells.length; i++) {
-            var h = this.parentTable.interface.getHeight(this.cells[i].item) +
-                        this.cells[i].getMargin("top") +
-                        this.cells[i].getMargin("bottom");
+            var h = this.parentTable.interface.getHeight(this.cells[i].item);
+            h += this.cells[i].totalVerticalMargin();
             if (h > biggest) {
                 biggest = h;
             }
@@ -544,7 +599,7 @@
     
     
     
-        
+    
     /**
      * Function: margin
      * 
@@ -567,22 +622,97 @@
     };
     
     
-    
-    
-    /**
-     * Function: getMargin
-     * 
-     * Get the margin on some side.
-     * 
-     * Parameters:
-     *      side - which side the margin goes.
-     */
-    Row.prototype.getMargin = function (side) {
-        return this.margins[side];
-    };
-    
+        
 
-    
+    /**
+     * Function: layoutRow
+     * 
+     * Lays out just this row.
+     */
+    Row.prototype.layout = function (leftBound, topBound, rightBound, bottomBound) {
+                    
+        
+        var thisSide = [],
+            hmargin = 0,
+            alignments = {left: this.getAllWithAlign("left"),
+                          right: this.getAllWithAlign("right"),
+                          center: this.getAllWithAlign("center")};
+        
+        leftBound += this.margins.left;
+        rightBound -= this.margins.right;
+            
+        
+        //Set the y position for all the elements.
+        for (var j = 0; j < this.numCells(); j++) {
+            
+            this.parentTable.interface.setY(
+                this.get(j).item,
+                topBound + this.margins.top + this.get(j).margins.top
+            );
+            
+        }
+        
+        
+        
+        //Place left aligned cells.
+        thisSide = alignments.left;
+        for (j = 0; j < thisSide.length; j++) {
+            
+            this.parentTable.interface.setX(
+                thisSide[j].item,
+                leftBound + thisSide[j].margins.left
+            );
+            leftBound += this.parentTable.interface.getWidth(thisSide[j].item) +
+                            thisSide[j].totalHorizontalMargin();
+            
+        }
+        
+        
+        
+        //Place right aligned cells.
+        thisSide = alignments.right;
+        for (j = 0; j < thisSide.length; j++) {
+            
+            this.parentTable.interface.setX(
+                thisSide[j].item,
+                rightBound - this.parentTable.interface.getWidth(thisSide[j].item) - thisSide[j].margins.right
+            );
+            rightBound -= this.parentTable.interface.getWidth(thisSide[j].item) +
+                            thisSide[j].totalHorizontalMargin();
+            
+        }
+        
+        
+        
+        //Place center aligned cells. Center aligned cells are placed equidistant from eachother.
+        thisSide = alignments.center;
+        if (thisSide.length) {
+            
+            var totalWidth = 0;
+            
+            //Work out how much space the cells take up horizontally.
+            for (j = 0; j < thisSide.length; j++) {
+                totalWidth += this.parentTable.interface.getWidth(thisSide[j].item);
+            }
+            
+            //Work out the gap between elemets.
+            var gap = rightBound - leftBound - totalWidth;
+            gap /= thisSide.length + 1;
+            leftBound += gap;
+            
+            //Assign X positions.
+            for (j = 0; j < thisSide.length; j++) {
+                this.parentTable.interface.setX(thisSide[j].item, leftBound);
+                leftBound += this.parentTable.interface.getWidth(thisSide[j].item) + gap;
+            }
+
+        }
+        
+        
+        return this.getHeight();
+            
+
+    };
     
     
     
@@ -612,13 +742,8 @@
     function Cell(item, parentTable) {
         this.item = item;
         this.align = parentTable.interface.align;
-        var defaultMargin = parentTable.interface.margin;
-        this.margins = {
-            left: defaultMargin,
-            right: defaultMargin,
-            top: defaultMargin,
-            bottom: defaultMargin,
-        };
+        this.margins = {};
+        this.margin(parentTable.interface.margin);
     }
     Cell.prototype = Object.create(Object.prototype);
     
@@ -654,6 +779,20 @@
     };
     
     
+    /**
+     * Function: center
+     * 
+     * Set this cell alignment to center.
+     * 
+     * Returns:
+     * this cell.
+     */
+    Cell.prototype.center = function () {
+        this.align = "center";
+        return this;
+    };
+    
+    
     
     
     /**
@@ -681,18 +820,32 @@
     };
     
     
+        
+    
+    /**
+     * Function: totalHorizontalMargin
+     * 
+     * Get the total horizontal margins.
+     * 
+     * Returns:
+     * Left margin + right margin.
+     */
+    Cell.prototype.totalHorizontalMargin = function () {
+        return this.margins.left + this.margins.right;
+    };
+    
     
     
     /**
-     * Function: getMargin
+     * Function: totalVerticalMargin
      * 
-     * Get the margin on some side.
+     * Get the total horizontal margins.
      * 
-     * Parameters:
-     *      side - which side the margin goes.
+     * Returns:
+     * Top margin + bottom margin.
      */
-    Cell.prototype.getMargin = function (side) {
-        return this.margins[side];
+    Cell.prototype.totalVerticalMargin = function () {
+        return this.margins.top + this.margins.bottom;
     };
     
     
@@ -706,6 +859,7 @@
     
     //exports
     TablePacker.Cell = Cell;
+    TablePacker.Row = Row;
     if (typeof module !== "undefined") {
         module.exports = TablePacker;
     } else if (typeof window !== "undefined") {

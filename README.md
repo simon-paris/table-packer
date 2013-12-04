@@ -6,8 +6,8 @@ JavaScript. Currently a WIP. Use with caution.
 
 ###TODO list:
  * Tests
- * Vertical alignment
  * Better demo
+ * Better overflow policies
 
 
 ##Documentation
@@ -48,10 +48,11 @@ function returns it.
     table.row();
 ```
 
-The `row` function also returns a row object. You can set the margins on rows just like cells.
-You can also add cells to rows after advancing to the next row. To do this, you need to pass in a
-cell object, not just your item. If the item does not fit, it will ignore your overflowPolicy setting
-and do something similar to to SQUASH policy. For example, in this snippet, we add an item to a
+The `row` function also returns a row object. You can set the margins and alignments on rows
+just like cells. (Valid values for alignments are "top", "bottom" and "center".) .You can also
+add cells to rows after advancing to the next row. To do this, you need to pass in a cell object,
+not just your item. If the item does not fit, it will ignore your overflowPolicy setting and
+do something similar to to SQUASH policy. For example, in this snippet, we add an item to a
 row that is already completed.
 
 ```javascript
@@ -78,7 +79,8 @@ change them to suit your own data structures.
 ```javascript
     TablePacker.defaults.align = "center";
     TablePacker.defaults.margin = 0;
-    TablePacker.defaults.rowMargin = 10
+    TablePacker.defaults.rowMargin = 10;
+    TablePacker.defaults.rowAlign = "top";
     TablePacker.defaults.getX = function (o) { return o.position.x; };
     TablePacker.defaults.getY = function (o) { return o.position.y; };
     TablePacker.defaults.setX = function (o, x) { o.position.x = x; };
@@ -87,6 +89,13 @@ change them to suit your own data structures.
     TablePacker.defaults.getHeight = function (o) { return o.height;};
     TablePacker.defaults.overflowPolicy = TablePacker.OVERFLOW_POLICY.NEW_ROW;
 ```
+
+The `TablePacker.defaults.overflowPolicy` descibes what happens when there is no more room in the table.
+Valid values are: 
+ * EXCEPTION: Throws an exception when there is no more room in the table.
+ * SQUISH: Don't care about overflows.
+ * DISCARD: Ignore insersions that don't fit.
+ * NEW_ROW (default): Create a new row when the current row is full.
 
 
 ###Other things
@@ -98,7 +107,7 @@ The `each` method is calls a function for each item in the table.
 ```
 
 
-The `setBounds` function can resize the table.
+The `setBounds` method can resize the table.
 
 ```setBounds
     table.setBounds(xPos, yPos, width, height);

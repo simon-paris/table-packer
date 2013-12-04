@@ -134,11 +134,19 @@
                     redrawStage();
                 },
                 "Add center aligned": function() {
-                    table.add(randomRect());
+                    table.add(randomRect()).center();
                     redrawStage();
                 },
-                "Next row": function() {
-                    table.row();
+                "Top aligned row": function() {
+                    table.row().top();
+                    redrawStage();
+                },
+                "Bottom aligned row": function() {
+                    table.row().bottom();
+                    redrawStage();
+                },
+                "Center aligned row": function() {
+                    table.row().center();
                     redrawStage();
                 },
                 "Reset": function() {

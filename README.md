@@ -2,12 +2,9 @@ table-packer
 ============
 
 A simple, pure JS UI layout library for HTML5 canvas and non browser based
-JavaScript. Currently a WIP. Use with caution.
+JavaScript. It's great if you're using JavaScript as a scripting engine in a game,
+and you want it to run on multiple platforms.
 
-###TODO list:
- * Tests
- * Better demo
- * Better overflow policies
 
 
 ##Documentation
@@ -115,5 +112,9 @@ The `setBounds` method can resize the table.
 
 
 
+###TODO list:
+ * Tests
+ * Better demo
+ * Better overflow policies
 
 

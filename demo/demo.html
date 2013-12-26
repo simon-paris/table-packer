@@ -1,7 +1,7 @@
 <!DOCTYPE html5>
 <html>
     <head>
-        <script type="text/javascript" src="../src/tablePacker.js"></script>
+        <script type="text/javascript" src="../src/table-packer.js"></script>
         <script type="text/javascript" src="pixi.js"></script>
         <script type="text/javascript" src="dat.gui.min.js"></script>
         <link rel="stylesheet" type="text/css" href="style.css">
@@ -18,7 +18,7 @@
                 graphics = null;
             
             function width() {
-                return document.body.clientWidth - PAGE_MARGIN * 2;
+                return document.body.clientWidth - PAGE_MARGIN * 2 - 200;
             }
             
             function height() {

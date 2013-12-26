@@ -1,0 +1,23 @@
+{
+  "name": "table-packer",
+  "version": "1.0.0",
+  "homepage": "https://github.com/simon-paris/table-packer",
+  "authors": [
+    "simon-paris <simon.paris.93@gmail.com>"
+  ],
+  "description": "A simple, pure JS UI layout library for HTML5 canvas and non browser based JavaScript.",
+  "main": "src/table-packer.js",
+  "keywords": [
+    "table",
+    "ui",
+    "html5"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

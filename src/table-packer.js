@@ -197,17 +197,20 @@
      */
     TablePacker.prototype.layout = function () {
         
-        //copy the boulds object because we're going to be modifying it.
         var topBound = this.bounds.y,
             bottomBound = this.bounds.y + this.bounds.h,
             thisSide = null,
             height = 0,
             i = 0,
+            
+            //bucket sort the rows by align
             alignments = {top: this.getAllWithAlign("top"),
                           bottom: this.getAllWithAlign("bottom"),
                           center: this.getAllWithAlign("center")};
         
         
+        
+        //layout rows on top
         thisSide = alignments.top;
         for (i = 0; i < thisSide.length; i++) {
             
@@ -222,6 +225,7 @@
         }
         
         
+        //layout rows on bottom
         thisSide = alignments.bottom;
         for (i = 0; i < thisSide.length; i++) {
             
@@ -238,12 +242,14 @@
         
         
         
+        //layout centered rows
         thisSide = alignments.center;
         var totalHeight = 0;
         for (i = 0; i < thisSide.length; i++) {
             totalHeight += thisSide[i].getHeight();
         }
         
+        //gap is the distance between elements
         var gap = bottomBound - topBound - totalHeight;
         gap /= thisSide.length + 1;
         topBound += gap;
@@ -311,7 +317,7 @@
     /**
      * Structure: TablePacker.defaults
      * 
-     * The default settings for new TablePackers. When tablePackers are created, this object
+     * The default settings for new TablePackers. When TablePackers are created, this object
      * is copied. You can set these variables to something that works with your data structures.
      * 
      * For example - if you use object.position.x instead of object.x for storing position data

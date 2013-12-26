@@ -1,0 +1,27 @@
+{
+  "name": "table-packer",
+  "version": "1.0.0",
+  "description": "A simple, pure JS UI layout library for HTML5 canvas and non browser based",
+  "main": "src/table-packer.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/simon-paris/table-packer.git"
+  },
+  "keywords": [
+    "ui",
+    "table",
+    "html5",
+    "game"
+  ],
+  "author": "simon-paris",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/simon-paris/table-packer/issues"
+  }
+}
